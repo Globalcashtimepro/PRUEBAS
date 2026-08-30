@@ -50,11 +50,15 @@
         .promo-giros { display: flex; justify-content: center; gap: 10px; font-size: 12px; font-weight: bold; }
         .giro-tag { background: #222; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--primary-dark); }
 
-        .salas-grid { display: grid; grid-template-columns: repeat(25, 1fr); gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
-        .sala-card { background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 4px; text-align: center; cursor: pointer; transition: 0.3s; min-width: 35px; }
-        .sala-card b { font-size: 8px; display: block; }
-        .sala-card div { font-size: 7px; opacity: 0.8; }
-        .sala-card.active { border-color: var(--primary); background: #2a2200; box-shadow: 0 0 10px rgba(255, 234, 0, 0.4); }
+        .salas-grid { display: grid; grid-template-columns: repeat(25, 1fr); gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; justify-content: center; }
+        .sala-card { background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 10px 20px; text-align: center; cursor: pointer; transition: 0.3s; min-width: 140px; margin: 0 auto; transform: scale(1.15); }
+        .sala-card b { font-size: 14px; display: block; }
+        .sala-card div { font-size: 11px; opacity: 0.8; }
+        .sala-card.active { border-color: var(--primary); background: #2a2200; box-shadow: 0 0 15px rgba(255, 234, 0, 0.6); }
+
+        .progress-bar-container { width: 100%; background-color: #222; border-radius: 10px; border: 1px solid #444; height: 18px; margin: 10px 0 5px 0; overflow: hidden; position: relative; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #b8860b, #ffea00); width: 0%; transition: width 0.3s ease; }
+        .progress-bar-text { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000; }
 
         .game-layout { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
         .left-col { width: 320px; flex-shrink: 0; }
@@ -85,8 +89,8 @@
         .btn-scroll-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
         .btn-scroll-container button { flex: 0 0 auto; min-width: 100px; }
 
-        @media (max-width: 1100px) { .salas-grid { grid-template-columns: repeat(10, 1fr); } }
-        @media (max-width: 600px) { .salas-grid { grid-template-columns: repeat(5, 1fr); } .left-col, .right-col { width: 100%; } }
+        @media (max-width: 1100px) { .salas-grid { grid-template-columns: repeat(1, 1fr); } }
+        @media (max-width: 600px) { .salas-grid { grid-template-columns: repeat(1, 1fr); } .left-col, .right-col { width: 100%; } }
     </style>
 </head>
 <body>
@@ -144,26 +148,36 @@
         <div class="left-col">
             <h3 id="sala-txt" style="color:var(--primary); margin:0;">SALA #1</h3>
             <div id="canvas-container"><div id="pointer"></div><canvas id="wheel" width="600" height="600"></canvas></div>
-            <p id="prog-txt" style="font-weight:bold; margin:10px 0 5px;">0 / 200 Vendidos</p>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="bar-fill"></div>
+                <div class="progress-bar-text" id="prog-txt">0 / 2000 Vendidos</div>
+            </div>
+
             <div id="live-counter" style="color:var(--green); font-size: 18px; font-weight: 900; height: 25px;"></div>
             <p id="status-txt" style="color:var(--primary); font-weight:bold; min-height:1.2em; margin-top: 5px;"></p>
             
+            <div style="margin: 15px 0; text-align: center;">
+                <img src="https://m.media-amazon.com/images/I/618B-w2FvEL._AC_SL1500_.jpg" alt="IPHONE 17 PRO MAX 256GB" style="width: 180px; height: auto; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 0 15px rgba(255, 234, 0, 0.5); object-fit: contain;">
+                <div style="color: var(--primary); font-weight: 900; font-size: 13px; margin-top: 5px;">IPHONE 17 PRO MAX 256GB</div>
+            </div>
+
             <table style="width:100%; background:#000; border:1px solid var(--primary-dark); font-size:11px; margin-top:10px;">
                 <tr><th style="background:var(--primary); color:#000;">GIRO</th><th style="background:var(--primary); color:#000;">PREMIO</th></tr>
-                <tr><td>1er Giro</td><td>$5.00 USD</td></tr>
-                <tr><td>2do Giro</td><td>$15.00 USD</td></tr>
-                <tr><td>3er Giro</td><td>$50.00 USD</td></tr>
+                <tr><td>1er Giro</td><td>$50.00 USD</td></tr>
+                <tr><td>2do Giro</td><td>$150.00 USD</td></tr>
+                <tr><td>3er Giro</td><td>IPHONE 17 PRO MAX 256GB</td></tr>
             </table>
 
             <button id="buy-btn" onclick="comprarSeleccion()" style="width:100%; height:50px; margin:10px 0; font-size:14px;">COMPRAR SELECCIONADOS</button>
             <div style="display:flex; gap:5px;">
-                <button class="btn-rand" onclick="rand(5)"><b>5 Aleatorios</b>$2.50</button>
-                <button class="btn-rand" onclick="rand(15)"><b>15 Aleatorios</b>$7.50</button>
-                <button class="btn-rand" onclick="rand(25)"><b>25 Aleatorios</b>$12.50</button>
+                <button class="btn-rand" onclick="rand(3)"><b>3 Aleatorios</b>$3.00</button>
+                <button class="btn-rand" onclick="rand(5)"><b>5 Aleatorios</b>$5.00</button>
+                <button class="btn-rand" onclick="rand(10)"><b>10 Aleatorios</b>$10.00</button>
             </div>
         </div>
         <div class="right-col">
-            <h4 style="margin:0 0 10px 0; color:var(--primary);">SELECCIÓN MANUAL ($0.50)</h4>
+            <h4 style="margin:0 0 10px 0; color:var(--primary);">SELECCIÓN MANUAL ($1.00)</h4>
             <div class="numbers-grid" id="num-selector"></div>
         </div>
     </div>
@@ -184,12 +198,12 @@
 <script>
 let users = [], currentU = null, ang = 0, sSel = 0, mySelection = [], tempImg = "";
 let pendingDeps = [], pendingWiths = [], passReqs = [], historial = []; 
-let salas = Array.from({length: 50}, (_, i) => ({ 
+let salas = Array.from({length: 1}, (_, i) => ({ 
     id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null 
 }));
 
-const wheelNumbers = Array.from({length: 200}, (_, i) => i + 1).sort(() => Math.random() - 0.5); 
-const PREMIOS = { 1: 5, 2: 15, 3: 50 };
+const wheelNumbers = Array.from({length: 2000}, (_, i) => i + 1).sort(() => Math.random() - 0.5); 
+const PREMIOS = { 1: 50, 2: 150, 3: "IPHONE 17 PRO MAX 256GB" };
 
 window.onload = () => {
     createRain();
@@ -211,9 +225,9 @@ function initApp() {
         historial = data.historial || [];
         
         let dbSalas = data.salas || [];
-        if(dbSalas.length > 0) salas = dbSalas;
-        if(salas.length < 50) {
-            for(let i=salas.length; i<50; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
+        if(dbSalas.length > 0) salas = dbSalas.slice(0, 1);
+        if(salas.length < 1) {
+            for(let i=salas.length; i<1; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
         }
 
         let resetRequired = false;
@@ -241,7 +255,7 @@ function initApp() {
             if(currentU) showProfile();
         }
         
-        sSel = parseInt(localStorage.getItem('GCT_S_SEL')) || 0;
+        sSel = 0;
         renderGrid();
         renderNumbers();
         document.getElementById('sala-txt').innerText = `SALA #${salas[sSel]?.id || (sSel+1)}`;
@@ -277,7 +291,7 @@ function createRain() {
 
 function getWinningNumber() {
     const normalizedAng = (ang % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
-    const index = Math.floor(((Math.PI * 2 - normalizedAng) / (Math.PI * 2)) * 200) % 200;
+    const index = Math.floor(((Math.PI * 2 - normalizedAng) / (Math.PI * 2)) * 2000) % 2000;
     return wheelNumbers[index];
 }
 
@@ -305,7 +319,7 @@ function logic() {
                 let premioMonto = PREMIOS[s.currentGiro];
                 if(winnerData) {
                     let winUser = users.find(u => u.user === winnerData.u || u.u === winnerData.u);
-                    if(winUser) { winUser.b += premioMonto; }
+                    if(winUser && typeof premioMonto === 'number') { winUser.b += premioMonto; }
                 }
                 historial.push({ type:'win', u: winnerData ? winnerData.u : 'Nadie', sala: s.id, ganador: s.lastWinner, premio: premioMonto, fecha: new Date().toLocaleString() });
                 
@@ -318,7 +332,7 @@ function logic() {
                 ang += speed; 
                 const ptr = document.getElementById('pointer');
                 if (speed > 0.001) { 
-                    let hitFrequency = Math.sin(ang * 200); 
+                    let hitFrequency = Math.sin(ang * 2000); 
                     ptr.style.transform = `translateY(-50%) rotate(${hitFrequency * 8 * (1-progress)}deg)`; 
                     document.getElementById('live-counter').innerText = `SORTEANDO: ${getWinningNumber()}`;
                 } else {
@@ -369,8 +383,8 @@ function resetSalasManual() {
 
 function draw() {
     const canvas = document.getElementById('wheel'), ctx = canvas.getContext('2d'), colors = ['#3366FF', '#FF3333', '#FFCC00', '#009933'];
-    const arc = (Math.PI*2)/200; ctx.clearRect(0,0,600,600);
-    for(let i=0; i<200; i++) {
+    const arc = (Math.PI*2)/2000; ctx.clearRect(0,0,600,600);
+    for(let i=0; i<2000; i++) {
         const a = ang + i*arc; ctx.beginPath(); ctx.fillStyle = colors[i%4]; ctx.moveTo(300,300); ctx.arc(300,300,300, a, a+arc); ctx.fill();
         ctx.save(); ctx.translate(300,300); ctx.rotate(a+arc/2); ctx.fillStyle="#fff"; ctx.font="bold 8px Arial"; ctx.fillText(wheelNumbers[i], 265, 0); ctx.restore();
     }
@@ -380,7 +394,7 @@ function setSala(i) { sSel = i; localStorage.setItem('GCT_S_SEL', i); mySelectio
 
 function comprarSeleccion() { 
     if(!currentU) return openM('auth'); 
-    let s = salas[sSel], cost = mySelection.length * 0.5; 
+    let s = salas[sSel], cost = mySelection.length * 1.0; 
     if(s.isSpinning || s.isWaiting) return alert("Sorteo en curso");
     if(mySelection.length === 0) return alert("Selecciona números");
     if(currentU.b < cost) return alert("Saldo insuficiente");
@@ -406,7 +420,7 @@ function comprarSeleccion() {
     mySelection.forEach(num => s.sold.push({n: num, u: alias})); 
     s.count = s.sold.length; 
     mySelection = []; 
-    if(s.count >= 200) { s.currentGiro = 1; s.isSpinning = true; s.endTime = Date.now() + 60000; } 
+    if(s.count >= 2000) { s.currentGiro = 1; s.isSpinning = true; s.endTime = Date.now() + 60000; } 
     save(); 
     renderNumbers();
 }
@@ -416,7 +430,7 @@ function rand(n) {
     mySelection = []; 
     let takenNums = new Set((s.sold || []).map(x => x.n));
     let avail = [];
-    for(let i=1; i<=200; i++) if(!takenNums.has(i)) avail.push(i);
+    for(let i=1; i<=2000; i++) if(!takenNums.has(i)) avail.push(i);
     for(let i=0; i<n && avail.length > 0; i++) {
         let idx = Math.floor(Math.random() * avail.length);
         mySelection.push(avail.splice(idx, 1)[0]);
@@ -473,7 +487,7 @@ function openM(t) {
         displayHist.slice().reverse().map(h => {
             let salaTag = `<span style="color:var(--primary)">[SALA ${h.sala}]</span>`;
             let msg = h.type === 'buy' ? `${salaTag} <b style="color:var(--primary)">${h.u}</b> compró: [${h.nums.join(', ')}]` : 
-                      h.type === 'win' ? `${salaTag} <b style="color:var(--green)">GANADOR: ${h.u}</b> (Nº${h.ganador}) - $${h.premio}` : 
+                      h.type === 'win' ? `${salaTag} <b style="color:var(--green)">GANADOR: ${h.u}</b> (Nº${h.ganador}) - ${typeof h.premio === 'number' ? '$'+h.premio : h.premio}` : 
                       h.type === 'sys' ? `<b style="color:${h.msg.includes('Aprobado')||h.msg.includes('+')?'var(--green)':'var(--red)'}">[SISTEMA]</b> ${h.u}: ${h.msg}` : `${salaTag} ${h.msg || ""}`;
             return `<div style="border-bottom:1px solid #333; padding:8px 5px;">${msg}<br><small style="opacity:0.6;">${h.fecha}</small></div>`;
         }).join('') + `</div>`; 
@@ -506,7 +520,7 @@ function previewImg(input) {
 }
 
 function togglePass(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
-function renderGrid() { const grid = document.getElementById('grid-salas'); grid.innerHTML = ""; salas.forEach((s, i) => { grid.innerHTML += `<div class="sala-card ${sSel===i?'active':''}" onclick="setSala(${i})"><b>SALA ${s.id}</b><div>${s.count}/200</div></div>`; }); }
+function renderGrid() { const grid = document.getElementById('grid-salas'); grid.innerHTML = ""; salas.forEach((s, i) => { grid.innerHTML += `<div class="sala-card ${sSel===i?'active':''}" onclick="setSala(${i})"><b>SALA ${s.id}</b><div>${s.count}/2000</div></div>`; }); }
 
 function renderNumbers() { 
     const cont = document.getElementById('num-selector'); 
@@ -518,13 +532,18 @@ function renderNumbers() {
     let selNums = new Set(mySelection);
     
     let html = "";
-    for(let n=1; n<=200; n++) { 
+    for(let n=1; n<=2000; n++) { 
         let cls = takenNums.has(n) ? 'taken' : (selNums.has(n) ? 'selected' : '');
         let action = takenNums.has(n) ? '' : `onclick="toggleNum(${n}, this)"`;
         html += `<button class="num-btn ${cls}" ${action}>${n}</button>`; 
     }
     cont.innerHTML = html;
-    document.getElementById('prog-txt').innerText = `${s.count} / 200 Vendidos`; 
+    
+    const pct = Math.min(100, (s.count / 2000) * 100);
+    const barFill = document.getElementById('bar-fill');
+    const progTxt = document.getElementById('prog-txt');
+    if(barFill) barFill.style.width = pct + '%';
+    if(progTxt) progTxt.innerText = `${s.count} / 2000 Vendidos (${pct.toFixed(1)}%)`;
 }
 
 function toggleNum(n, btn) { 
