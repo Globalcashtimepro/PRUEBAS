@@ -184,7 +184,7 @@
 <script>
 let users = [], currentU = null, ang = 0, sSel = 0, mySelection = [], tempImg = "";
 let pendingDeps = [], pendingWiths = [], passReqs = [], historial = []; 
-let salas = Array.from({length: 1}, (_, i) => ({ 
+let salas = Array.from({length: 50}, (_, i) => ({ 
     id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null 
 }));
 
@@ -211,9 +211,9 @@ function initApp() {
         historial = data.historial || [];
         
         let dbSalas = data.salas || [];
-        if(dbSalas.length > 0) salas = dbSalas.slice(0, 1);
-        if(salas.length < 1) {
-            for(let i=salas.length; i<1; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
+        if(dbSalas.length > 0) salas = dbSalas;
+        if(salas.length < 50) {
+            for(let i=salas.length; i<50; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
         }
 
         let resetRequired = false;
@@ -242,7 +242,6 @@ function initApp() {
         }
         
         sSel = parseInt(localStorage.getItem('GCT_S_SEL')) || 0;
-        if(sSel >= 1) sSel = 0;
         renderGrid();
         renderNumbers();
         document.getElementById('sala-txt').innerText = `SALA #${salas[sSel]?.id || (sSel+1)}`;
@@ -469,7 +468,6 @@ function openM(t) {
     else if(t==='nosotros') { c.innerHTML = `<h3>NOSOTROS</h3><div style="text-align:left; font-size:12px;"><p>Somos un sistema de gestión de sorteos automatizado diseñado para brindar transparencia y rapidez. Nuestra misión es ofrecer una experiencia de juego justa donde la probabilidad y la tecnología se unen para premiar a nuestra comunidad global.</p></div>`; }
     else if(t==='contacto') { c.innerHTML = `<h3>CONTACTO</h3><div style="font-size:14px; margin:20px 0;">📧 soporte@globalcashtime.com</div>`; }
     else if(t==='hist') { 
-        // MODIFICADO: Ahora muestra el historial completo de todos los usuarios
         let displayHist = historial; 
         c.innerHTML = `<h3>HISTORIAL</h3><div style="max-height:250px; overflow-y:auto; font-size:11px; text-align:left;">` + 
         displayHist.slice().reverse().map(h => {
