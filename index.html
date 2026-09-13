@@ -85,6 +85,11 @@
         .btn-scroll-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
         .btn-scroll-container button { flex: 0 0 auto; min-width: 100px; }
 
+        .progress-box { width: 100%; background: #000; border: 1px solid #333; border-radius: 8px; padding: 8px; margin: 10px 0; box-sizing: border-box; }
+        .progress-bar-bg { width: 100%; background: #222; height: 16px; border-radius: 8px; overflow: hidden; border: 1px solid #444; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #ffea00, #00ff66); width: 0%; transition: width 0.3s ease; }
+        .progress-text { font-size: 11px; font-weight: bold; color: var(--primary); margin-top: 5px; text-align: center; }
+
         @media (max-width: 1100px) { .salas-grid { grid-template-columns: repeat(10, 1fr); } }
         @media (max-width: 600px) { .salas-grid { grid-template-columns: repeat(5, 1fr); } .left-col, .right-col { width: 100%; } }
     </style>
@@ -145,6 +150,14 @@
             <h3 id="sala-txt" style="color:var(--primary); margin:0;">SALA #1</h3>
             <div id="canvas-container"><div id="pointer"></div><canvas id="wheel" width="600" height="600"></canvas></div>
             <p id="prog-txt" style="font-weight:bold; margin:10px 0 5px;">0 / 200 Vendidos</p>
+            
+            <div class="progress-box">
+                <div class="progress-bar-bg">
+                    <div id="bar-fill" class="progress-bar-fill"></div>
+                </div>
+                <div id="bar-text" class="progress-text">Falta 100% para llenarse</div>
+            </div>
+
             <div id="live-counter" style="color:var(--green); font-size: 18px; font-weight: 900; height: 25px;"></div>
             <p id="status-txt" style="color:var(--primary); font-weight:bold; min-height:1.2em; margin-top: 5px;"></p>
             
@@ -184,7 +197,7 @@
 <script>
 let users = [], currentU = null, ang = 0, sSel = 0, mySelection = [], tempImg = "";
 let pendingDeps = [], pendingWiths = [], passReqs = [], historial = []; 
-let salas = Array.from({length: 50}, (_, i) => ({ 
+let salas = Array.from({length: 1}, (_, i) => ({ 
     id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null 
 }));
 
@@ -211,9 +224,9 @@ function initApp() {
         historial = data.historial || [];
         
         let dbSalas = data.salas || [];
-        if(dbSalas.length > 0) salas = dbSalas;
-        if(salas.length < 50) {
-            for(let i=salas.length; i<50; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
+        if(dbSalas.length > 0) salas = dbSalas.slice(0, 1);
+        if(salas.length < 1) {
+            for(let i=salas.length; i<1; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
         }
 
         let resetRequired = false;
@@ -241,7 +254,7 @@ function initApp() {
             if(currentU) showProfile();
         }
         
-        sSel = parseInt(localStorage.getItem('GCT_S_SEL')) || 0;
+        sSel = 0;
         renderGrid();
         renderNumbers();
         document.getElementById('sala-txt').innerText = `SALA #${salas[sSel]?.id || (sSel+1)}`;
@@ -328,4 +341,532 @@ function logic() {
                 draw(); 
             }
         } else if(s.isWaiting) {
-            if(now >= s.endTim
+            if(now >= s.endTime) {
+                if(s.waitStep === 1) {
+                    s.waitStep = 2;
+                    s.endTime = now + 10000;
+                    if(s.currentGiro < 3) {
+                        s.currentGiro++;
+                        s.isSpinning = true;
+                        s.endTime = now + 60000;
+                    }
+                } else if(s.waitStep === 2) {
+                    s.isWaiting = false;
+                    s.waitStep = 0;
+                    if(s.currentGiro >= 3) {
+                        s.currentGiro = 0; s.count = 0; s.sold = []; s.lastWinner = null;
+                    }
+                }
+                change = true;
+            }
+        }
+    });
+
+    if(change) save();
+    updateUI();
+}
+
+function updateUI() {
+    let s = salas[sSel];
+    if(!s) return;
+
+    let count = s.count || 0;
+    let pctFilled = (count / 200) * 100;
+    let pctMissing = (100 - pctFilled).toFixed(1);
+    if(pctMissing.endsWith('.0')) pctMissing = Math.round(100 - pctFilled);
+
+    document.getElementById('prog-txt').innerText = `${count} / 200 Vendidos`;
+    
+    let barFill = document.getElementById('bar-fill');
+    let barText = document.getElementById('bar-text');
+    if(barFill) barFill.style.width = `${pctFilled}%`;
+    if(barText) barText.innerText = `Falta ${pctMissing}% para llenarse`;
+
+    let st = document.getElementById('status-txt');
+    if(s.isSpinning) {
+        let segs = Math.max(0, Math.ceil((s.endTime - Date.now())/1000));
+        st.innerText = `GIRO #${s.currentGiro} EN PROCESO (${segs}s)...`;
+    } else if(s.isWaiting) {
+        if(s.lastWinner) st.innerText = `¡GANADOR GIRO #${s.currentGiro}: NÚMERO ${s.lastWinner}!`;
+        else st.innerText = `PREPARANDO SIGUIENTE GIRO...`;
+    } else {
+        st.innerText = s.count >= 200 ? "¡SALA LLENA! INICIANDO..." : "ESPERANDO QUE SE LLENE LA SALA";
+    }
+
+    renderGrid();
+}
+
+function renderGrid() {
+    let grid = document.getElementById('grid-salas');
+    if(!grid) return;
+    grid.innerHTML = "";
+    salas.forEach((s, i) => {
+        let card = document.createElement('div');
+        card.className = `sala-card ${i === sSel ? 'active' : ''}`;
+        card.onclick = () => selectSala(i);
+        card.innerHTML = `<b>SALA #${s.id}</b><div>${s.count || 0}/200</div>`;
+        grid.appendChild(card);
+    });
+}
+
+function selectSala(i) {
+    sSel = i;
+    localStorage.setItem('GCT_S_SEL', sSel);
+    mySelection = [];
+    document.getElementById('sala-txt').innerText = `SALA #${salas[sSel].id}`;
+    renderGrid();
+    renderNumbers();
+    updateUI();
+}
+
+function renderNumbers() {
+    let container = document.getElementById('num-selector');
+    if(!container) return;
+    container.innerHTML = "";
+    let s = salas[sSel];
+    let soldNums = (s && s.sold) ? s.sold.map(x => x.n) : [];
+
+    for(let i=1; i<=200; i++) {
+        let btn = document.createElement('button');
+        btn.className = 'num-btn';
+        btn.innerText = i;
+        if(soldNums.includes(i)) {
+            btn.classList.add('taken');
+        } else {
+            if(mySelection.includes(i)) btn.classList.add('selected');
+            btn.onclick = () => toggleNum(i);
+        }
+        container.appendChild(btn);
+    }
+}
+
+function toggleNum(n) {
+    let idx = mySelection.indexOf(n);
+    if(idx > -1) mySelection.splice(idx, 1);
+    else mySelection.push(n);
+    renderNumbers();
+}
+
+function rand(qty) {
+    let s = salas[sSel];
+    let soldNums = (s && s.sold) ? s.sold.map(x => x.n) : [];
+    let available = [];
+    for(let i=1; i<=200; i++) {
+        if(!soldNums.includes(i) && !mySelection.includes(i)) available.push(i);
+    }
+    available.sort(() => Math.random() - 0.5);
+    mySelection.push(...available.slice(0, qty));
+    renderNumbers();
+}
+
+function comprarSeleccion() {
+    if(!currentU) return openM('auth');
+    if(mySelection.length === 0) return alert("Selecciona al menos un número");
+    let cost = mySelection.length * 0.5;
+    if(currentU.b < cost) return alert("Saldo insuficiente. Por favor deposita.");
+
+    let s = salas[sSel];
+    if(s.count + mySelection.length > 200) return alert("No hay suficientes cupos en esta sala.");
+
+    currentU.b -= cost;
+    mySelection.forEach(n => {
+        s.sold.push({ n: n, u: currentU.user || currentU.u });
+    });
+    s.count = s.sold.length;
+
+    if(s.count >= 200 && !s.isSpinning && !s.isWaiting && s.currentGiro === 0) {
+        s.currentGiro = 1;
+        s.isSpinning = true;
+        s.endTime = Date.now() + 60000;
+    }
+
+    mySelection = [];
+    save();
+    renderNumbers();
+    updateUI();
+    showProfile();
+    alert("¡Compra realizada con éxito!");
+}
+
+function draw() {
+    const canvas = document.getElementById('wheel');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cw = canvas.width, ch = canvas.height;
+    const cx = cw/2, cy = ch/2, radius = cx - 10;
+
+    ctx.clearRect(0,0,cw,ch);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffea00';
+    ctx.fill();
+
+    const totalSegments = 200;
+    const arcSize = (Math.PI * 2) / totalSegments;
+
+    for(let i=0; i<totalSegments; i++) {
+        const angle = ang + i * arcSize;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, angle, angle + arcSize);
+        ctx.fillStyle = i % 2 === 0 ? '#111111' : '#222222';
+        ctx.fill();
+        ctx.strokeStyle = '#333333';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#ffea00';
+        ctx.font = "bold 9px sans-serif";
+        ctx.fillText(wheelNumbers[i], radius - 8, 3);
+        ctx.restore();
+    }
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+    ctx.fillStyle = '#050505';
+    ctx.fill();
+    ctx.strokeStyle = '#ffea00';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+function showProfile() {
+    if(!currentU) return;
+    document.getElementById('guest-btn').style.display = 'none';
+    document.getElementById('user-profile').style.display = 'block';
+    document.getElementById('prof-name').innerText = currentU.user || currentU.u || "Usuario";
+    document.getElementById('prof-balance').innerText = `$${(currentU.b || 0).toFixed(2)}`;
+    document.getElementById('user-code-txt').innerText = currentU.user || currentU.u || "---";
+}
+
+function logout() {
+    localStorage.removeItem('GCT_SESSION');
+    location.reload();
+}
+
+function copyRefLink() {
+    let code = currentU ? (currentU.user || currentU.u) : '';
+    let link = `${window.location.origin}${window.location.pathname}?ref=${code}`;
+    navigator.clipboard.writeText(link);
+    alert("¡Link de referido copiado!");
+}
+
+function openM(type) {
+    let m = document.getElementById('modal');
+    let mc = document.getElementById('modal-content');
+    m.style.display = 'flex';
+
+    if(type === 'auth') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">ACCESO / REGISTRO</h3>
+            <input type="text" id="auth-u" placeholder="Usuario">
+            <div class="password-wrapper">
+                <input type="password" id="auth-p" placeholder="Contraseña">
+                <span class="eye-icon" onclick="togglePass('auth-p')">👁️</span>
+            </div>
+            <button onclick="loginProcess()" style="width:100%; margin-top:10px;">INGRESAR</button>
+            <button onclick="regProcess()" style="width:100%; margin-top:5px; background:#333; color:#fff;">REGISTRARSE</button>
+            <div class="auth-links" onclick="openM('forgot')">¿Olvidaste tu contraseña?</div>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'forgot') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">RECUPERAR CLAVE</h3>
+            <p style="font-size:11px; color:#ccc;">Ingresa tu usuario para solicitar restablecimiento al administrador.</p>
+            <input type="text" id="rec-u" placeholder="Usuario">
+            <button onclick="reqResetPass()" style="width:100%; margin-top:10px;">SOLICITAR</button>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'dep') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">DEPOSITAR</h3>
+            <p style="font-size:11px;">Envía USDT (TRC20) a la siguiente billetera:</p>
+            <div class="wallet-box" onclick="copyWallet()">TXXXXXX... (Clic para copiar)</div>
+            <input type="number" id="dep-amt" placeholder="Monto $USD" step="0.5">
+            <div class="upload-box" onclick="document.getElementById('dep-file').click()">
+                <span>Subir comprobante (Imagen)</span>
+                <input type="file" id="dep-file" accept="image/*" style="display:none;" onchange="previewImg(this)">
+                <img id="preview-img" src="">
+            </div>
+            <button onclick="sendDep()" style="width:100%; margin-top:10px;">ENVIAR REVISIÓN</button>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'with') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">RETIRAR</h3>
+            <p style="font-size:11px;">Monto mínimo: $5.00 USD</p>
+            <input type="number" id="with-amt" placeholder="Monto $USD">
+            <input type="text" id="with-wallet" placeholder="Dirección Wallet USDT TRC20">
+            <button onclick="sendWith()" style="width:100%; margin-top:10px;">SOLICITAR RETIRO</button>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'ref') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">SISTEMA DE REFERIDOS</h3>
+            <p style="font-size:12px;">Gana comisiones invitando a tus amigos a jugar en Global Cash Time.</p>
+            <button onclick="copyRefLink()" style="width:100%;">COPIAR MI LINK DE REFERIDO</button>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'hist') {
+        let myHist = historial.filter(h => h.u === (currentU.user || currentU.u));
+        let html = myHist.map(h => `<div style="font-size:11px; border-bottom:1px solid #333; padding:5px; text-align:left;"><b>${h.fecha}</b> - Ganaste $${h.premio} en Sala #${h.sala} con N°${h.ganador}</div>`).join('') || '<p style="font-size:11px;">Sin historial de victorias aún.</p>';
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">HISTORIAL DE PREMIOS</h3>
+            <div style="max-height:200px; overflow-y:auto;">${html}</div>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'faq') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">PREGUNTAS FRECUENTES</h3>
+            <div style="font-size:11px; text-align:left; max-height:250px; overflow-y:auto;">
+                <b>¿Cómo juego?</b><br>Elige tus números manualmente o aleatorios por $0.50 c/u. Cuando la sala se llena, inician los giros automáticos.<br><br>
+                <b>¿Cuáles son los premios?</b><br>Giro 1: $5. Giro 2: $15. Giro 3: $50.<br><br>
+                <b>¿Cómo retiro mis ganancias?</b><br>Ve a la sección RETIRAR e ingresa tu billetera USDT TRC20.
+            </div>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'nosotros') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">NOSOTROS</h3>
+            <p style="font-size:11px; text-align:left;">Global Cash Time es una plataforma de sorteos y entretenimiento en tiempo real transparente, segura y basada en tecnología web interactiva.</p>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    } else if(type === 'contacto') {
+        mc.innerHTML = `
+            <h3 style="color:var(--primary); margin-top:0;">CONTACTO</h3>
+            <p style="font-size:11px; text-align:left;">Soporte Oficial 24/7:<br>Telegram: @GlobalCashTimeSupport<br>Email: soporte@globalcashtime.com</p>
+            <button onclick="closeM()" style="margin-top:15px; background:transparent; border:none; color:#aaa;">Cerrar</button>
+        `;
+    }
+}
+
+function closeM() { document.getElementById('modal').style.display = 'none'; }
+
+function togglePass(id) {
+    let input = document.getElementById(id);
+    if(input.type === 'password') input.type = 'text';
+    else input.type = 'password';
+}
+
+function loginProcess() {
+    let u = document.getElementById('auth-u').value.trim();
+    let p = document.getElementById('auth-p').value.trim();
+    if(!u || !p) return alert("Completa los campos");
+
+    if(u === "ADMIN_GLOBAL" && p === "ADMIN123") {
+        currentU = {u: "ADMIN_GLOBAL", b: 0};
+        localStorage.setItem('GCT_SESSION', "ADMIN_GLOBAL");
+        document.getElementById('admin-panel').style.display = 'block';
+        showProfile();
+        closeM();
+        return;
+    }
+
+    let found = users.find(x => (x.u === u || x.user === u) && x.p === p);
+    if(found) {
+        currentU = found;
+        localStorage.setItem('GCT_SESSION', found.user || found.u);
+        showProfile();
+        closeM();
+    } else {
+        alert("Usuario o contraseña incorrectos");
+    }
+}
+
+function regProcess() {
+    let u = document.getElementById('auth-u').value.trim();
+    let p = document.getElementById('auth-p').value.trim();
+    if(!u || !p) return alert("Completa los campos");
+
+    let exists = users.find(x => x.u === u || x.user === u);
+    if(exists) return alert("El usuario ya existe");
+
+    let newUser = { u: u, user: u, p: p, b: 0 };
+    users.push(newUser);
+    currentU = newUser;
+    localStorage.setItem('GCT_SESSION', u);
+    save();
+    showProfile();
+    closeM();
+    alert("¡Registro exitoso!");
+}
+
+function reqResetPass() {
+    let u = document.getElementById('rec-u').value.trim();
+    if(!u) return alert("Ingresa tu usuario");
+    passReqs.push({ u: u, fecha: new Date().toLocaleString() });
+    save();
+    closeM();
+    alert("Solicitud enviada al administrador.");
+}
+
+function copyWallet() {
+    navigator.clipboard.writeText("TXXXXXX_WALLET_TRC20_DEMO");
+    alert("Dirección de Wallet copiada");
+}
+
+function previewImg(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            tempImg = e.target.result;
+            let img = document.getElementById('preview-img');
+            img.src = tempImg;
+            img.style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function sendDep() {
+    let amt = parseFloat(document.getElementById('dep-amt').value);
+    if(!amt || amt <= 0) return alert("Monto inválido");
+    if(!tempImg) return alert("Sube el comprobante");
+
+    pendingDeps.push({ u: currentU.user || currentU.u, amt: amt, img: tempImg, fecha: new Date().toLocaleString() });
+    tempImg = "";
+    save();
+    closeM();
+    alert("Depósito enviado a revisión.");
+}
+
+function sendWith() {
+    let amt = parseFloat(document.getElementById('with-amt').value);
+    let wallet = document.getElementById('with-wallet').value.trim();
+    if(!amt || amt < 5) return alert("Monto mínimo $5.00");
+    if(!wallet) return alert("Ingresa tu billetera");
+    if(currentU.b < amt) return alert("Saldo insuficiente");
+
+    currentU.b -= amt;
+    pendingWiths.push({ u: currentU.user || currentU.u, amt: amt, wallet: wallet, fecha: new Date().toLocaleString() });
+    save();
+    showProfile();
+    closeM();
+    alert("Solicitud de retiro enviada.");
+}
+
+function renderAdmin() {
+    let box = document.getElementById('pending-deps');
+    box.setAttribute('data-view', 'notif');
+    let html = `<h5 style="color:var(--primary); margin:5px 0;">DEPÓSITOS PENDIENTES</h5>`;
+    if(pendingDeps.length === 0) html += `<p style="font-size:10px;">No hay depósitos pendientes.</p>`;
+    pendingDeps.forEach((d, idx) => {
+        html += `
+            <div class="admin-notif">
+                <b>${d.u}</b> - $${d.amt} (${d.fecha})<br>
+                <img src="${d.img}" style="max-width:100%; max-height:80px; margin:5px 0;"><br>
+                <button onclick="appDep(${idx})" style="font-size:8px; padding:3px 6px;">APROBAR</button>
+                <button onclick="rejDep(${idx})" style="font-size:8px; padding:3px 6px; background:red; color:white;">RECHAZAR</button>
+            </div>
+        `;
+    });
+
+    html += `<h5 style="color:var(--primary); margin:10px 0 5px 0;">RETIROS PENDIENTES</h5>`;
+    if(pendingWiths.length === 0) html += `<p style="font-size:10px;">No hay retiros pendientes.</p>`;
+    pendingWiths.forEach((w, idx) => {
+        html += `
+            <div class="admin-notif">
+                <b>${w.u}</b> - $${w.amt} USD<br>Wallet: ${w.wallet}<br>
+                <button onclick="appWith(${idx})" style="font-size:8px; padding:3px 6px;">PAGADO</button>
+                <button onclick="rejWith(${idx})" style="font-size:8px; padding:3px 6px; background:red; color:white;">RECHAZAR</button>
+            </div>
+        `;
+    });
+    box.innerHTML = html;
+}
+
+function appDep(idx) {
+    let d = pendingDeps[idx];
+    let u = users.find(x => x.u === d.u || x.user === d.u);
+    if(u) u.b += d.amt;
+    pendingDeps.splice(idx, 1);
+    save();
+    renderAdmin();
+}
+
+function rejDep(idx) {
+    pendingDeps.splice(idx, 1);
+    save();
+    renderAdmin();
+}
+
+function appWith(idx) {
+    pendingWiths.splice(idx, 1);
+    save();
+    renderAdmin();
+}
+
+function rejWith(idx) {
+    let w = pendingWiths[idx];
+    let u = users.find(x => x.u === w.u || x.user === w.u);
+    if(u) u.b += w.amt;
+    pendingWiths.splice(idx, 1);
+    save();
+    renderAdmin();
+}
+
+function renderUserDB() {
+    let box = document.getElementById('pending-deps');
+    box.setAttribute('data-view', 'db');
+    let html = `<h5 style="color:var(--primary); margin:5px 0;">BASE DE DATOS DE USUARIOS</h5>`;
+    users.forEach((u, idx) => {
+        html += `
+            <div class="admin-notif">
+                <b>${u.user || u.u}</b> - Saldo: $${u.b.toFixed(2)} - Pass: ${u.p}<br>
+                <input type="number" id="edit-b-${idx}" value="${u.b}" style="width:70px; padding:2px; font-size:10px;">
+                <button onclick="saveUserBal(${idx})" style="font-size:8px; padding:3px 6px;">GUARDAR SALDO</button>
+            </div>
+        `;
+    });
+    box.innerHTML = html;
+}
+
+function saveUserBal(idx) {
+    let val = parseFloat(document.getElementById(`edit-b-${idx}`).value);
+    if(!isNaN(val)) {
+        users[idx].b = val;
+        save();
+        alert("Saldo actualizado");
+        renderUserDB();
+    }
+}
+
+function renderPassReqs() {
+    let box = document.getElementById('pending-deps');
+    box.setAttribute('data-view', 'pass');
+    let html = `<h5 style="color:var(--primary); margin:5px 0;">SOLICITUDES DE CONTRASEÑA</h5>`;
+    if(passReqs.length === 0) html += `<p style="font-size:10px;">No hay solicitudes.</p>`;
+    passReqs.forEach((r, idx) => {
+        html += `
+            <div class="admin-notif">
+                <b>${r.u}</b> - ${r.fecha}<br>
+                <button onclick="clearPassReq(${idx})" style="font-size:8px; padding:3px 6px;">MARCAR ATENDIDO</button>
+            </div>
+        `;
+    });
+    box.innerHTML = html;
+}
+
+function clearPassReq(idx) {
+    passReqs.splice(idx, 1);
+    save();
+    renderPassReqs();
+}
+
+function resetSalasManual() {
+    if(confirm("¿Estás seguro de reiniciar todas las salas a 0?")) {
+        salas = Array.from({length: 1}, (_, i) => ({ 
+            id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null 
+        }));
+        save();
+        alert("Salas reiniciadas.");
+    }
+}
+</script>
+</body>
+</html>
