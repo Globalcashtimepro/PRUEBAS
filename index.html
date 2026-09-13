@@ -50,15 +50,11 @@
         .promo-giros { display: flex; justify-content: center; gap: 10px; font-size: 12px; font-weight: bold; }
         .giro-tag { background: #222; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--primary-dark); }
 
-        .salas-grid { display: grid; grid-template-columns: repeat(25, 1fr); gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; justify-content: center; }
-        .sala-card { background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 10px 20px; text-align: center; cursor: pointer; transition: 0.3s; min-width: 140px; margin: 0 auto; transform: scale(1.15); }
-        .sala-card b { font-size: 14px; display: block; }
-        .sala-card div { font-size: 11px; opacity: 0.8; }
-        .sala-card.active { border-color: var(--primary); background: #2a2200; box-shadow: 0 0 15px rgba(255, 234, 0, 0.6); }
-
-        .progress-bar-container { width: 100%; background-color: #222; border-radius: 10px; border: 1px solid #444; height: 18px; margin: 10px 0 5px 0; overflow: hidden; position: relative; }
-        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #b8860b, #ffea00); width: 0%; transition: width 0.3s ease; }
-        .progress-bar-text { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px #000; }
+        .salas-grid { display: grid; grid-template-columns: repeat(25, 1fr); gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .sala-card { background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 4px; text-align: center; cursor: pointer; transition: 0.3s; min-width: 35px; }
+        .sala-card b { font-size: 8px; display: block; }
+        .sala-card div { font-size: 7px; opacity: 0.8; }
+        .sala-card.active { border-color: var(--primary); background: #2a2200; box-shadow: 0 0 10px rgba(255, 234, 0, 0.4); }
 
         .game-layout { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; }
         .left-col { width: 320px; flex-shrink: 0; }
@@ -89,8 +85,8 @@
         .btn-scroll-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
         .btn-scroll-container button { flex: 0 0 auto; min-width: 100px; }
 
-        @media (max-width: 1100px) { .salas-grid { grid-template-columns: repeat(1, 1fr); } }
-        @media (max-width: 600px) { .salas-grid { grid-template-columns: repeat(1, 1fr); } .left-col, .right-col { width: 100%; } }
+        @media (max-width: 1100px) { .salas-grid { grid-template-columns: repeat(10, 1fr); } }
+        @media (max-width: 600px) { .salas-grid { grid-template-columns: repeat(5, 1fr); } .left-col, .right-col { width: 100%; } }
     </style>
 </head>
 <body>
@@ -148,36 +144,26 @@
         <div class="left-col">
             <h3 id="sala-txt" style="color:var(--primary); margin:0;">SALA #1</h3>
             <div id="canvas-container"><div id="pointer"></div><canvas id="wheel" width="600" height="600"></canvas></div>
-            
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="bar-fill"></div>
-                <div class="progress-bar-text" id="prog-txt">0 / 2000 Vendidos</div>
-            </div>
-
+            <p id="prog-txt" style="font-weight:bold; margin:10px 0 5px;">0 / 200 Vendidos</p>
             <div id="live-counter" style="color:var(--green); font-size: 18px; font-weight: 900; height: 25px;"></div>
             <p id="status-txt" style="color:var(--primary); font-weight:bold; min-height:1.2em; margin-top: 5px;"></p>
             
-            <div style="margin: 15px 0; text-align: center;">
-                <img src="https://m.media-amazon.com/images/I/618B-w2FvEL._AC_SL1500_.jpg" alt="IPHONE 17 PRO MAX 256GB" style="width: 180px; height: auto; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 0 15px rgba(255, 234, 0, 0.5); object-fit: contain;">
-                <div style="color: var(--primary); font-weight: 900; font-size: 13px; margin-top: 5px;">IPHONE 17 PRO MAX 256GB</div>
-            </div>
-
             <table style="width:100%; background:#000; border:1px solid var(--primary-dark); font-size:11px; margin-top:10px;">
                 <tr><th style="background:var(--primary); color:#000;">GIRO</th><th style="background:var(--primary); color:#000;">PREMIO</th></tr>
-                <tr><td>1er Giro</td><td>$50.00 USD</td></tr>
-                <tr><td>2do Giro</td><td>$150.00 USD</td></tr>
-                <tr><td>3er Giro</td><td>IPHONE 17 PRO MAX 256GB</td></tr>
+                <tr><td>1er Giro</td><td>$5.00 USD</td></tr>
+                <tr><td>2do Giro</td><td>$15.00 USD</td></tr>
+                <tr><td>3er Giro</td><td>$50.00 USD</td></tr>
             </table>
 
             <button id="buy-btn" onclick="comprarSeleccion()" style="width:100%; height:50px; margin:10px 0; font-size:14px;">COMPRAR SELECCIONADOS</button>
             <div style="display:flex; gap:5px;">
-                <button class="btn-rand" onclick="rand(3)"><b>3 Aleatorios</b>$3.00</button>
-                <button class="btn-rand" onclick="rand(5)"><b>5 Aleatorios</b>$5.00</button>
-                <button class="btn-rand" onclick="rand(10)"><b>10 Aleatorios</b>$10.00</button>
+                <button class="btn-rand" onclick="rand(5)"><b>5 Aleatorios</b>$2.50</button>
+                <button class="btn-rand" onclick="rand(15)"><b>15 Aleatorios</b>$7.50</button>
+                <button class="btn-rand" onclick="rand(25)"><b>25 Aleatorios</b>$12.50</button>
             </div>
         </div>
         <div class="right-col">
-            <h4 style="margin:0 0 10px 0; color:var(--primary);">SELECCIÓN MANUAL ($1.00)</h4>
+            <h4 style="margin:0 0 10px 0; color:var(--primary);">SELECCIÓN MANUAL ($0.50)</h4>
             <div class="numbers-grid" id="num-selector"></div>
         </div>
     </div>
@@ -202,8 +188,8 @@ let salas = Array.from({length: 1}, (_, i) => ({
     id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null 
 }));
 
-const wheelNumbers = Array.from({length: 2000}, (_, i) => i + 1).sort(() => Math.random() - 0.5); 
-const PREMIOS = { 1: 50, 2: 150, 3: "IPHONE 17 PRO MAX 256GB" };
+const wheelNumbers = Array.from({length: 200}, (_, i) => i + 1).sort(() => Math.random() - 0.5); 
+const PREMIOS = { 1: 5, 2: 15, 3: 50 };
 
 window.onload = () => {
     createRain();
@@ -225,7 +211,7 @@ function initApp() {
         historial = data.historial || [];
         
         let dbSalas = data.salas || [];
-        if(dbSalas.length > 0) salas = dbSalas.slice(0, 1);
+        if(dbSalas.length > 0) salas = dbSalas;
         if(salas.length < 1) {
             for(let i=salas.length; i<1; i++) salas.push({id: i+1, count: 0, sold: [], isSpinning: false, isWaiting: false, waitStep: 0, currentGiro: 0, endTime: 0, lastWinner: null});
         }
@@ -255,7 +241,7 @@ function initApp() {
             if(currentU) showProfile();
         }
         
-        sSel = 0;
+        sSel = parseInt(localStorage.getItem('GCT_S_SEL')) || 0;
         renderGrid();
         renderNumbers();
         document.getElementById('sala-txt').innerText = `SALA #${salas[sSel]?.id || (sSel+1)}`;
@@ -291,7 +277,7 @@ function createRain() {
 
 function getWinningNumber() {
     const normalizedAng = (ang % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
-    const index = Math.floor(((Math.PI * 2 - normalizedAng) / (Math.PI * 2)) * 2000) % 2000;
+    const index = Math.floor(((Math.PI * 2 - normalizedAng) / (Math.PI * 2)) * 200) % 200;
     return wheelNumbers[index];
 }
 
@@ -319,7 +305,7 @@ function logic() {
                 let premioMonto = PREMIOS[s.currentGiro];
                 if(winnerData) {
                     let winUser = users.find(u => u.user === winnerData.u || u.u === winnerData.u);
-                    if(winUser && typeof premioMonto === 'number') { winUser.b += premioMonto; }
+                    if(winUser) { winUser.b += premioMonto; }
                 }
                 historial.push({ type:'win', u: winnerData ? winnerData.u : 'Nadie', sala: s.id, ganador: s.lastWinner, premio: premioMonto, fecha: new Date().toLocaleString() });
                 
@@ -332,7 +318,7 @@ function logic() {
                 ang += speed; 
                 const ptr = document.getElementById('pointer');
                 if (speed > 0.001) { 
-                    let hitFrequency = Math.sin(ang * 2000); 
+                    let hitFrequency = Math.sin(ang * 200); 
                     ptr.style.transform = `translateY(-50%) rotate(${hitFrequency * 8 * (1-progress)}deg)`; 
                     document.getElementById('live-counter').innerText = `SORTEANDO: ${getWinningNumber()}`;
                 } else {
@@ -342,320 +328,4 @@ function logic() {
                 draw(); 
             }
         } else if(s.isWaiting) {
-            if(s.waitStep === 1) {
-                if(i === sSel && s.lastWinner) {
-                    document.getElementById('live-counter').innerText = `GANADOR: #${s.lastWinner}`;
-                }
-                if(now >= s.endTime) {
-                    s.waitStep = 0;
-                    if (s.currentGiro < 3) {
-                        s.isWaiting = false; 
-                        s.currentGiro++; 
-                        s.isSpinning = true; 
-                        s.endTime = now + 60000; 
-                    } else {
-                        s.currentGiro = 0; s.count = 0; s.sold = []; s.lastWinner = null; s.isWaiting = false; s.isSpinning = false;
-                        if(i === sSel) { 
-                            document.getElementById('live-counter').innerText = ""; 
-                            document.getElementById('status-txt').innerText = ""; 
-                            renderNumbers(); renderGrid();
-                        }
-                    }
-                    change = true;
-                }
-            }
-        }
-    });
-    if(change) save();
-    updateStatus();
-}
-
-function resetSalasManual() {
-    if(confirm("¿RESET TOTAL DE TODAS LAS SALAS AHORA?")) {
-        salas.forEach(s => {
-            s.currentGiro = 0; s.count = 0; s.sold = []; s.lastWinner = null; s.isSpinning = false; s.isWaiting = false; s.waitStep = 0;
-        });
-        save();
-        alert("Salas Reiniciadas");
-        location.reload();
-    }
-}
-
-function draw() {
-    const canvas = document.getElementById('wheel'), ctx = canvas.getContext('2d'), colors = ['#3366FF', '#FF3333', '#FFCC00', '#009933'];
-    const arc = (Math.PI*2)/2000; ctx.clearRect(0,0,600,600);
-    for(let i=0; i<2000; i++) {
-        const a = ang + i*arc; ctx.beginPath(); ctx.fillStyle = colors[i%4]; ctx.moveTo(300,300); ctx.arc(300,300,300, a, a+arc); ctx.fill();
-        ctx.save(); ctx.translate(300,300); ctx.rotate(a+arc/2); ctx.fillStyle="#fff"; ctx.font="bold 8px Arial"; ctx.fillText(wheelNumbers[i], 265, 0); ctx.restore();
-    }
-}
-
-function setSala(i) { sSel = i; localStorage.setItem('GCT_S_SEL', i); mySelection = []; document.getElementById('sala-txt').innerText = `SALA #${salas[i]?.id || (i+1)}`; document.getElementById('live-counter').innerText = ""; document.getElementById('status-txt').innerText = ""; renderGrid(); renderNumbers(); }
-
-function comprarSeleccion() { 
-    if(!currentU) return openM('auth'); 
-    let s = salas[sSel], cost = mySelection.length * 1.0; 
-    if(s.isSpinning || s.isWaiting) return alert("Sorteo en curso");
-    if(mySelection.length === 0) return alert("Selecciona números");
-    if(currentU.b < cost) return alert("Saldo insuficiente");
-
-    currentU.b -= cost; 
-    let alias = (currentU.user || currentU.u);
-    
-    if(!currentU.participations) currentU.participations = 0;
-    currentU.participations += mySelection.length;
-    
-    if(currentU.participations >= 20 && currentU.referredBy) {
-        let referrer = users.find(x => x.user === currentU.referredBy || x.u === currentU.referredBy);
-        if(referrer) {
-            let cycles = Math.floor(currentU.participations / 20);
-            referrer.b += (1 * cycles);
-            currentU.participations = currentU.participations % 20; 
-            historial.push({ type: 'sys', u: referrer.user || referrer.u, msg: `Bono Referido de ${alias}: +$${cycles}.00`, sala: 'SISTEMA', fecha: new Date().toLocaleString() });
-        }
-    }
-
-    historial.push({ type:'buy', u: alias, sala: s.id, nums: [...mySelection], fecha: new Date().toLocaleString() });
-    if(!s.sold) s.sold = []; 
-    mySelection.forEach(num => s.sold.push({n: num, u: alias})); 
-    s.count = s.sold.length; 
-    mySelection = []; 
-    if(s.count >= 2000) { s.currentGiro = 1; s.isSpinning = true; s.endTime = Date.now() + 60000; } 
-    save(); 
-    renderNumbers();
-}
-
-function rand(n) { 
-    let s = salas[sSel]; 
-    mySelection = []; 
-    let takenNums = new Set((s.sold || []).map(x => x.n));
-    let avail = [];
-    for(let i=1; i<=2000; i++) if(!takenNums.has(i)) avail.push(i);
-    for(let i=0; i<n && avail.length > 0; i++) {
-        let idx = Math.floor(Math.random() * avail.length);
-        mySelection.push(avail.splice(idx, 1)[0]);
-    }
-    renderNumbers(); 
-}
-
-function openM(t) { 
-    const c = document.getElementById('modal-content'); document.getElementById('modal').style.display='flex'; 
-    if(t==='auth') { c.innerHTML = `<h3>LOGIN</h3><input id="li-u" placeholder="Usuario o Correo"><div class="password-wrapper"><input id="li-p" type="password" placeholder="Clave"><span class="eye-icon" onclick="togglePass('li-p')">👁️</span></div><button onclick="login()" style="width:100%; margin-top:10px;">ENTRAR</button><div class="auth-links"><span onclick="openM('reg')">Registrarse</span> | <span onclick="openM('recover')">Olvidé mi clave</span></div>`; }
-    else if(t==='reg') { 
-        const urlParams = new URLSearchParams(window.location.search);
-        const refCode = urlParams.get('ref') || "";
-        c.innerHTML = `<h3>REGISTRO</h3><p style="font-size:10px;">Solo @gmail.com - Clave min. 8 dígitos</p><input id="re-user" placeholder="Nombre de Usuario"><input id="re-u" placeholder="Correo electrónico"><div class="password-wrapper"><input id="re-p" type="password" placeholder="Crear Clave"><span class="eye-icon" onclick="togglePass('re-p')">👁️</span></div><input id="re-ref" placeholder="Código Referido (Opcional)" value="${refCode}"><button onclick="register()" style="width:100%; margin-top:10px;">CREAR CUENTA</button><div class="auth-links"><span onclick="openM('auth')">Ya tengo cuenta</span></div>`; 
-    }
-    else if(t==='set_username') { c.innerHTML = `<h3>ASIGNAR USUARIO</h3><p style="font-size:11px;">Crea tu nombre de usuario (solo una vez)</p><input id="new-user-field" placeholder="Ej: Ganador777"><button onclick="assignUsername()" style="width:100%">GUARDAR Y CONTINUAR</button>`; }
-    else if(t==='recover') { c.innerHTML = `<h3>RECUPERAR</h3><p style="font-size:11px;">Ingresa tu correo para solicitar asistencia</p><input id="rec-u" placeholder="Tu correo"><button onclick="requestPass()" style="width:100%">ENVIAR SOLICITUD</button>`; }
-    else if(t==='dep') { 
-        c.innerHTML = `<h3>RECARGAR</h3><p style="font-size:10px; color:var(--primary);">Mínimo de depósito: $5.00 USD<br>Tiempo: 0 - 1H</p>
-        <div class="label-gold">BILLETERA USDT (TRC20)</div>
-        <div class="wallet-box" onclick="copyWallet()">TFtX2tLdjqTnTdVAUfQ8YNACv6QUAK9LAy</div>
-        <input id="dep-amt" type="number" placeholder="Monto $">
-        <div class="upload-box" onclick="document.getElementById('dep-img').click()">SUBIR COMPROBANTE</div>
-        <input type="file" id="dep-img" hidden accept="image/*" onchange="previewImg(this)">
-        <img id="preview-img">
-        <button onclick="solicitarDeposito()" style="width:100%; background:var(--green); color:#000;">ENVIAR COMPROBANTE</button>`; 
-    }
-    else if(t==='with') { c.innerHTML = `<h3>RETIRAR</h3><p style="font-size:10px; color:var(--red);">Mínimo de retiro: $10.00 USD<br>Tiempo: 0 - 1H</p><input id="wi-amt" type="number" placeholder="Monto $"><input id="wi-wallet" placeholder="Tu Billetera TRC20"><button onclick="solicitarRetiro()" style="width:100%; background:var(--red); color:#fff;">SOLICITAR RETIRO</button>`; }
-    else if(t==='ref') {
-        let myRefs = users.filter(u => u.referredBy === (currentU ? (currentU.user || currentU.u) : ''));
-        let refsHtml = myRefs.length > 0 ? myRefs.map(r => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span>${r.user || r.u}</span><span>${r.participations || 0}/20 Salas</span></div>`).join('') : "Aún no tienes referidos";
-
-        c.innerHTML = `<h3>SISTEMA DE REFERIDOS</h3>
-        <div style="text-align:left; font-size:11px; line-height:1.5;">
-            <p>Por cada referido que participe 20 veces , sea en la misma sala o salas diferentes<br>
-            <b style="color:var(--green)">Ganas $1 USDT de por vida cada vez que participe 20 veces</b></p>
-            <p>Si refieres a 10 personas y cada 1 participa 20 veces<br>Ganas $10 USDT de por vida cada vez que participe 20 veces</p>
-            <p>Si refieres a 100 personas y cada 1 participa 20 veces<br>Ganas $100 USDT de por vida cada vez que participe 20 veces</p>
-            <p>Si refieres a 1.000 personas y cada 1 participa 20 veces<br>Ganas $1,000 USDT de por vida cada vez que participe 20 veces</p>
-            <p>Si refieres a 10.000 personas y cada 1 participa 20 veces<br>Ganas $10,000 USDT de por vida cada vez que participe 20 veces</p>
-        </div>
-        <div style="background:#000; border-radius:8px; padding:10px; margin-top:10px; text-align:left;">
-            <b style="color:var(--primary); font-size:12px;">MIS REFERIDOS:</b>
-            <hr style="border:0; border-top:1px solid #333; margin:8px 0;">
-            <div style="max-height:150px; overflow-y:auto; font-size:10px;">${refsHtml}</div>
-        </div>`;
-    }
-    else if(t==='faq') { c.innerHTML = `<h3>PREGUNTAS FRECUENTES</h3><div style="text-align:left; font-size:12px;"><b>¿Qué es GLOBAL CASH TIME?</b><p>Es una plataforma de sorteos en tiempo real donde puedes adquirir números del 1 al 200 en diferentes salas. Cada sala reparte 3 premios automáticos al completarse los cupos, procesando pagos de forma instantánea mediante tecnología blockchain (TRC20).</p></div>`; }
-    else if(t==='nosotros') { c.innerHTML = `<h3>NOSOTROS</h3><div style="text-align:left; font-size:12px;"><p>Somos un sistema de gestión de sorteos automatizado diseñado para brindar transparencia y rapidez. Nuestra misión es ofrecer una experiencia de juego justa donde la probabilidad y la tecnología se unen para premiar a nuestra comunidad global.</p></div>`; }
-    else if(t==='contacto') { c.innerHTML = `<h3>CONTACTO</h3><div style="font-size:14px; margin:20px 0;">📧 soporte@globalcashtime.com</div>`; }
-    else if(t==='hist') { 
-        let displayHist = historial; 
-        c.innerHTML = `<h3>HISTORIAL</h3><div style="max-height:250px; overflow-y:auto; font-size:11px; text-align:left;">` + 
-        displayHist.slice().reverse().map(h => {
-            let salaTag = `<span style="color:var(--primary)">[SALA ${h.sala}]</span>`;
-            let msg = h.type === 'buy' ? `${salaTag} <b style="color:var(--primary)">${h.u}</b> compró: [${h.nums.join(', ')}]` : 
-                      h.type === 'win' ? `${salaTag} <b style="color:var(--green)">GANADOR: ${h.u}</b> (Nº${h.ganador}) - ${typeof h.premio === 'number' ? '$'+h.premio : h.premio}` : 
-                      h.type === 'sys' ? `<b style="color:${h.msg.includes('Aprobado')||h.msg.includes('+')?'var(--green)':'var(--red)'}">[SISTEMA]</b> ${h.u}: ${h.msg}` : `${salaTag} ${h.msg || ""}`;
-            return `<div style="border-bottom:1px solid #333; padding:8px 5px;">${msg}<br><small style="opacity:0.6;">${h.fecha}</small></div>`;
-        }).join('') + `</div>`; 
-    }
-    c.innerHTML += `<button onclick="closeM()" style="background:#444; margin-top:10px; width:100%;">CERRAR</button>`; 
-}
-
-function copyRefLink() {
-    if(!currentU) return openM('auth');
-    const link = window.location.origin + window.location.pathname + "?ref=" + (currentU.user || currentU.u);
-    navigator.clipboard.writeText(link).then(() => {
-        alert("¡Link copiado!");
-    });
-}
-
-function copyWallet() {
-    navigator.clipboard.writeText("TFtX2tLdjqTnTdVAUfQ8YNACv6QUAK9LAy").then(() => alert("¡Billetera copiada!"));
-}
-
-function previewImg(input) {
-    if(input.files && input.files[0]) {
-        let r = new FileReader();
-        r.onload = (e) => { 
-            tempImg = e.target.result; 
-            const p = document.getElementById('preview-img');
-            p.src = tempImg; p.style.display = 'block';
-        };
-        r.readAsDataURL(input.files[0]);
-    }
-}
-
-function togglePass(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
-function renderGrid() { const grid = document.getElementById('grid-salas'); grid.innerHTML = ""; salas.forEach((s, i) => { grid.innerHTML += `<div class="sala-card ${sSel===i?'active':''}" onclick="setSala(${i})"><b>SALA ${s.id}</b><div>${s.count}/2000</div></div>`; }); }
-
-function renderNumbers() { 
-    const cont = document.getElementById('num-selector'); 
-    if(!cont) return;
-    const s = salas[sSel]; 
-    if(!s) return;
-
-    let takenNums = new Set((s.sold || []).map(x => x.n));
-    let selNums = new Set(mySelection);
-    
-    let html = "";
-    for(let n=1; n<=2000; n++) { 
-        let cls = takenNums.has(n) ? 'taken' : (selNums.has(n) ? 'selected' : '');
-        let action = takenNums.has(n) ? '' : `onclick="toggleNum(${n}, this)"`;
-        html += `<button class="num-btn ${cls}" ${action}>${n}</button>`; 
-    }
-    cont.innerHTML = html;
-    
-    const pct = Math.min(100, (s.count / 2000) * 100);
-    const barFill = document.getElementById('bar-fill');
-    const progTxt = document.getElementById('prog-txt');
-    if(barFill) barFill.style.width = pct + '%';
-    if(progTxt) progTxt.innerText = `${s.count} / 2000 Vendidos (${pct.toFixed(1)}%)`;
-}
-
-function toggleNum(n, btn) { 
-    if(mySelection.includes(n)) {
-        mySelection = mySelection.filter(x => x !== n);
-        btn.classList.remove('selected');
-    } else {
-        mySelection.push(n);
-        btn.classList.add('selected');
-    }
-}
-
-function updateStatus() { let s = salas[sSel], st = document.getElementById('status-txt'); if(!s) return; if(s.isSpinning) st.innerText = `GIRO ${s.currentGiro} EN PROGRESO...`; else if(s.isWaiting) st.innerText = ""; }
-function showProfile() { document.getElementById('guest-btn').style.display='none'; document.getElementById('user-profile').style.display='block'; document.getElementById('prof-name').innerText = (currentU.user || currentU.u); }
-function updateUI() { if(currentU && currentU.u !== "ADMIN_GLOBAL") { let liveU = users.find(x => x.u === currentU.u); if(liveU) { currentU.b = liveU.b; currentU.participations = liveU.participations || 0; document.getElementById('prof-balance').innerText = `$${currentU.b.toFixed(2)}`; } } }
-function logout() { localStorage.removeItem('GCT_SESSION'); location.reload(); }
-function closeM() { document.getElementById('modal').style.display='none'; tempImg=""; }
-function showSentMsg() { const c = document.getElementById('modal-content'); c.innerHTML = `<h2 style="color:var(--green); margin: 50px 0;">ENVIADO</h2>`; setTimeout(() => { closeM(); }, 2000); }
-
-function register() { 
-    let usr = document.getElementById('re-user').value.trim(), u = document.getElementById('re-u').value.trim().toLowerCase(), p = document.getElementById('re-p').value, ref = document.getElementById('re-ref').value.trim(); 
-    if(!usr) return alert("Ingresa un nombre de usuario");
-    if(!u.endsWith("@gmail.com")) return alert("Solo @gmail.com"); 
-    if(p.length < 8) return alert("Mínimo 8 dígitos"); 
-    if(users.find(x => x.user === usr)) return alert("El nombre de usuario ya existe");
-    if(users.find(x => x.u === u)) return alert("El correo ya está registrado");
-    if(u && p) { users.push({u, user: usr, p, b: 0, referredBy: ref, participations: 0}); save(); alert("Registrado exitosamente"); openM('auth'); } 
-}
-
-function login() { 
-    let input = document.getElementById('li-u').value.trim().toLowerCase(), p = document.getElementById('li-p').value; 
-    if(input==="admin_global" && p==="CASH_TIME_2026") { localStorage.setItem('GCT_SESSION', "ADMIN_GLOBAL"); location.reload(); return; } 
-    let user = users.find(x => (x.u === input || x.user === input) && x.p === p); 
-    if(user) { 
-        if(!user.user) { currentU = user; openM('set_username'); return; }
-        localStorage.setItem('GCT_SESSION', user.user); location.reload(); 
-    } else alert("Datos incorrectos"); 
-}
-
-function assignUsername() {
-    let newU = document.getElementById('new-user-field').value.trim();
-    if(!newU) return alert("Ingresa un nombre");
-    if(users.find(x => x.user === newU)) return alert("Nombre de usuario ocupado");
-    currentU.user = newU; save(); localStorage.setItem('GCT_SESSION', newU); location.reload();
-}
-
-function requestPass() { let u = document.getElementById('rec-u').value; if(u) { passReqs.push({ u: u, info: "Solicitud de recuperación de clave", fecha: new Date().toLocaleString() }); save(); showSentMsg(); } }
-
-function solicitarDeposito() { 
-    let a = parseFloat(document.getElementById('dep-amt').value); 
-    if(a >= 5 && tempImg) { 
-        pendingDeps.push({ u: (currentU.user || currentU.u), a: a, img: tempImg, id: Date.now(), fecha: new Date().toLocaleString() }); 
-        save(); showSentMsg(); 
-    } else {
-        alert("Mínimo $5 USD y subir comprobante");
-    }
-}
-
-function solicitarRetiro() { let a = parseFloat(document.getElementById('wi-amt').value); let wal = document.getElementById('wi-wallet').value; if(a >= 10 && currentU.b >= a && wal) { currentU.b -= a; pendingWiths.push({ u: (currentU.user || currentU.u), a: a, wallet: wal, id: Date.now(), fecha: new Date().toLocaleString() }); save(); showSentMsg(); } }
-
-function renderAdmin() { 
-    const div = document.getElementById('pending-deps'); div.setAttribute('data-view', 'notif'); div.innerHTML = "<h4>NOTIFICACIONES</h4>"; 
-    if(!pendingDeps.length && !pendingWiths.length) div.innerHTML += "<p style='opacity:0.5'>Sin pendientes</p>";
-    pendingDeps.forEach((d, idx) => { div.innerHTML += `<div class="admin-notif"><b>DEPÓSITO: ${d.u} ($${d.a})</b><br><img src="${d.img}" style="width:100%; max-height:100px; object-fit:contain; margin:5px 0;"><br><button onclick="aprobarDep(${idx})">Aprobar</button><button onclick="pendingDeps.splice(${idx},1); save(); renderAdmin();" style="background:var(--red); color:#fff;">Eliminar</button></div>`; });
-    pendingWiths.forEach((w, idx) => { div.innerHTML += `<div class="admin-notif" style="border-color:var(--red);"><b>RETIRO: ${w.u} ($${w.a})</b><br><small>Wallet: ${w.wallet}</small><br><button onclick="aprobarWith(${idx})">Finalizar Pago</button><button onclick="rechazarWith(${idx})" style="background:var(--red); color:#fff;">Rechazar</button></div>`; }); 
-}
-
-function renderUserDB() { 
-    const div = document.getElementById('pending-deps'); div.setAttribute('data-view', 'db'); div.innerHTML = "<h4>BASE DE DATOS COMPLETA</h4>"; 
-    users.forEach((u, idx) => { div.innerHTML += `<div class="admin-notif" style="border-left-color:var(--link);"><div style="margin-bottom:8px;"><b>👤 ${u.user || 'SIN_USER'}</b><br>📧 Email: ${u.u}<br>🔑 Pass: <span style="color:var(--primary)">${u.p}</span><br>💰 Saldo: <b style="color:var(--green)">$${u.b.toFixed(2)}</b></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"><div style="display:flex; flex-direction:column; gap:3px;"><button onclick="editBal(${idx}, 0.5)" style="background:var(--green); color:#000; padding:4px; font-size:9px;">+ $0.50</button><button onclick="editBal(${idx}, 5)" style="background:var(--green); color:#000; padding:4px; font-size:9px;">+ $5.00</button><button onclick="editBal(${idx}, 10)" style="background:var(--green); color:#000; padding:4px; font-size:9px;">+ $10.00</button></div><div style="display:flex; flex-direction:column; gap:3px;"><button onclick="editBal(${idx}, -0.5)" style="background:var(--red); color:#fff; padding:4px; font-size:9px;">- $0.50</button><button onclick="editBal(${idx}, -5)" style="background:var(--red); color:#fff; padding:4px; font-size:9px;">- $5.00</button><button onclick="editBal(${idx}, -10)" style="background:var(--red); color:#fff; padding:4px; font-size:9px;">- $10.00</button></div></div></div>`; }); 
-}
-
-function renderPassReqs() { const div = document.getElementById('pending-deps'); div.setAttribute('data-view', 'pass'); div.innerHTML = "<h4>SOLICITUDES CLAVES</h4>"; if(!passReqs.length) div.innerHTML += "<p style='opacity:0.5'>Sin solicitudes</p>"; passReqs.forEach((r, idx) => { div.innerHTML += `<div class="admin-notif"><b>De: ${r.u}</b><br>${r.info}<br><small>${r.fecha}</small><br><button onclick="passReqs.splice(${idx},1); save(); renderPassReqs();">Eliminar Solicitud</button></div>`; }); }
-
-function editBal(idx, amt) { 
-    users[idx].b += amt; 
-    if(users[idx].b < 0) users[idx].b = 0; 
-    save(); 
-    renderUserDB(); 
-}
-
-function aprobarDep(idx) { 
-    let d = pendingDeps[idx]; 
-    let u = users.find(x => x.user === d.u || x.u === d.u); 
-    if(u) u.b += d.a; 
-    historial.push({ type: 'sys', u: d.u, msg: `Depósito Aprobado: +$${d.a}`, sala: 'SISTEMA', fecha: new Date().toLocaleString() }); 
-    pendingDeps.splice(idx, 1); 
-    save(); 
-    renderAdmin(); 
-}
-
-function aprobarWith(idx) { 
-    let w = pendingWiths[idx]; 
-    historial.push({ type: 'sys', u: w.u, msg: `Retiro Aprobado: -$${w.a}`, sala: 'SISTEMA', fecha: new Date().toLocaleString() }); 
-    pendingWiths.splice(idx, 1); 
-    save(); 
-    renderAdmin(); 
-}
-
-function rechazarWith(idx) { 
-    let w = pendingWiths[idx]; 
-    let u = users.find(x => x.user === w.u || x.u === w.u); 
-    if(u) u.b += w.a; 
-    historial.push({ type: 'sys', u: w.u, msg: `Retiro RECHAZADO: $${w.a}`, sala: 'SISTEMA', fecha: new Date().toLocaleString() }); 
-    pendingWiths.splice(idx, 1); 
-    save(); 
-    renderAdmin(); 
-}
-</script>
-
-<div style="font-size: 8px; color: #333; width: 100%; text-align: center; padding-bottom: 10px;">Todos los derechos reservados.</div>
-
-</body>
-</html>
-
+            if(s.waitStep === 1) 
