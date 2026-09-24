@@ -80,6 +80,10 @@
         .btn-scroll-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
         .btn-scroll-container button { flex: 0 0 auto; min-width: 100px; }
 
+        .btn-bank { width: 90%; margin: 6px auto; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 900; font-size: 12px; text-decoration: none; border-radius: 8px; box-sizing: border-box; }
+        .btn-pichincha { background: #ffda00; color: #002855; border: 1px solid #e6c200; }
+        .btn-guayaquil { background: #e30613; color: #ffffff; border: 1px solid #c4000d; }
+
         @media (max-width: 600px) { .left-col, .right-col { width: 100%; } }
     </style>
 </head>
@@ -155,7 +159,7 @@
             </div>
         </div>
         <div class="right-col">
-            <h4 style="margin:0 0 10px 0; color:var(--primary);">Selección Manual</h4>
+            <h4 style="margin:0 0 10px 0; color:var(--primary);">SELECCIÓN MANUAL</h4>
             <div class="numbers-grid" id="num-selector"></div>
         </div>
     </div>
@@ -395,7 +399,24 @@ function openM(t) {
             <button style="width:100%; background:var(--green); color:#000;">IR A RECARGAR</button>
         </a>`; 
     }
-    else if(t==='with') { c.innerHTML = `<h3>RETIRAR</h3><p style="font-size:10px; color:var(--red);">Mínimo de retiro: $10.00 Dólares<br>Tiempo: 0 - 1H</p><input id="wi-amt" type="number" placeholder="Monto $"><input id="wi-wallet" placeholder="PON TU BILLETERA DE USDT (TRC20) AQUÍ"><button onclick="solicitarRetiro()" style="width:100%; background:var(--red); color:#fff;">SOLICITAR RETIRO</button>`; }
+    else if(t==='with') { 
+        c.innerHTML = `<h3>RETIRAR</h3>
+        <p style="font-size:10px; color:var(--red);">Mínimo de retiro: $10.00 Dólares<br>Tiempo: 0 - 1H</p>
+        <input id="wi-amt" type="number" placeholder="Monto $">
+        
+        <a href="https://wa.me/message/DVU5L2S2UOYHA1" target="_blank" class="btn-bank btn-pichincha">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#002855"><rect width="24" height="24" rx="4" fill="#ffda00"/><path d="M5 5h14v5H5zM5 12h8v7H5z" fill="#002855"/></svg>
+            BANCO PICHINCHA
+        </a>
+        
+        <a href="https://wa.me/message/DVU5L2S2UOYHA1" target="_blank" class="btn-bank btn-guayaquil">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><rect width="24" height="24" rx="4" fill="#e30613"/><path d="M6 6h12v12H6z" fill="none" stroke="#ffffff" stroke-width="3"/><path d="M10 10h4v4h-4z" fill="#ffffff"/></svg>
+            BANCO GUAYAQUIL
+        </a>
+        
+        <input id="wi-wallet" placeholder="PON TU BILLETERA DE USDT (TRC20) AQUÍ">
+        <button onclick="solicitarRetiro()" style="width:100%; background:var(--red); color:#fff;">SOLICITAR RETIRO</button>`; 
+    }
     else if(t==='faq') { c.innerHTML = `<h3>PREGUNTAS FRECUENTES</h3><div style="text-align:left; font-size:12px;"><b>¿Qué es GLOBAL CASH TIME?</b><p>Es una plataforma de sorteos en tiempo real donde puedes adquirir números del 1 al 200. Cada sorteo reparte 3 premios automáticos al completarse los cupos.</p></div>`; }
     else if(t==='nosotros') { c.innerHTML = `<h3>NOSOTROS</h3><div style="text-align:left; font-size:12px;"><p>Somos un sistema de gestión de sorteos automatizado diseñado para brindar transparencia y rapidez. Nuestra misión es ofrecer una experiencia de juego justa donde la probabilidad y la tecnología se unen para premiar a nuestra comunidad global.</p></div>`; }
     else if(t==='contacto') { c.innerHTML = `<h3>CONTACTO</h3><div style="font-size:14px; margin:20px 0;">📧 soporte@globalcashtime.com</div>`; }
