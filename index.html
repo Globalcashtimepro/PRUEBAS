@@ -155,7 +155,7 @@
             </div>
         </div>
         <div class="right-col">
-            <h4 style="margin:0 0 10px 0; color:var(--primary);">SELECCIÓN MANUAL ($0.50)</h4>
+            <h4 style="margin:0 0 10px 0; color:var(--primary);">Selección Manual</h4>
             <div class="numbers-grid" id="num-selector"></div>
         </div>
     </div>
@@ -349,7 +349,7 @@ function draw() {
 
 function comprarSeleccion() { 
     if(!currentU) return openM('auth'); 
-    let s = gameData, cost = mySelection.length * 0.5; 
+    let s = gameData, cost = mySelection.length * 1.0; 
     if(s.isSpinning || s.isWaiting) return alert("Sorteo en curso");
     if(mySelection.length === 0) return alert("Selecciona números");
     if(currentU.b < cost) return alert("Saldo insuficiente");
@@ -395,7 +395,7 @@ function openM(t) {
             <button style="width:100%; background:var(--green); color:#000;">IR A RECARGAR</button>
         </a>`; 
     }
-    else if(t==='with') { c.innerHTML = `<h3>RETIRAR</h3><p style="font-size:10px; color:var(--red);">Mínimo de retiro: $10.00 Dólares<br>Tiempo: 0 - 1H</p><input id="wi-amt" type="number" placeholder="Monto $"><input id="wi-wallet" placeholder="Tu Billetera o Cuenta"><button onclick="solicitarRetiro()" style="width:100%; background:var(--red); color:#fff;">SOLICITAR RETIRO</button>`; }
+    else if(t==='with') { c.innerHTML = `<h3>RETIRAR</h3><p style="font-size:10px; color:var(--red);">Mínimo de retiro: $10.00 Dólares<br>Tiempo: 0 - 1H</p><input id="wi-amt" type="number" placeholder="Monto $"><input id="wi-wallet" placeholder="PON TU BILLETERA DE USDT (TRC20) AQUÍ"><button onclick="solicitarRetiro()" style="width:100%; background:var(--red); color:#fff;">SOLICITAR RETIRO</button>`; }
     else if(t==='faq') { c.innerHTML = `<h3>PREGUNTAS FRECUENTES</h3><div style="text-align:left; font-size:12px;"><b>¿Qué es GLOBAL CASH TIME?</b><p>Es una plataforma de sorteos en tiempo real donde puedes adquirir números del 1 al 200. Cada sorteo reparte 3 premios automáticos al completarse los cupos.</p></div>`; }
     else if(t==='nosotros') { c.innerHTML = `<h3>NOSOTROS</h3><div style="text-align:left; font-size:12px;"><p>Somos un sistema de gestión de sorteos automatizado diseñado para brindar transparencia y rapidez. Nuestra misión es ofrecer una experiencia de juego justa donde la probabilidad y la tecnología se unen para premiar a nuestra comunidad global.</p></div>`; }
     else if(t==='contacto') { c.innerHTML = `<h3>CONTACTO</h3><div style="font-size:14px; margin:20px 0;">📧 soporte@globalcashtime.com</div>`; }
